@@ -10,13 +10,15 @@
 #
 SUCCESS=0
 ERROR=1
+HOST=$1
+DATA_FILE=$2
 
 # Deleete Indices
-sudo curl -XDELETE http://localhost:9200/projects
+curl -XDELETE http://$HOST:9200/projects
 
 
 # Create mapping for index
-sudo curl -XPUT http://localhost:9200/projects/ -d '{
+curl -XPUT http://$HOST:9200/projects/ -d '{
     "mappings" : {
         "logs" : {
             "properties" : {
@@ -43,8 +45,6 @@ sudo curl -XPUT http://localhost:9200/projects/ -d '{
 }'
 
 # copy data file to server for Logstash to load
-sudo cp -f organization_info.json /opt/heimdall
-
-sudo /opt/logstash/bin/logstash -f /etc/logstash/conf.d/logstash.conf
+curl -XPOST http://$HOST:9200/projects/logs/_bulk --data-binary @$DATA_FILE
 
 exit $SUCCESS
